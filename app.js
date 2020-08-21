@@ -17,8 +17,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const uri = process.env.mongoURI;
 mongoose.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+        useNewUrlParser: true,
+        useUnifiedTopology: true
     })
     .then(() => {
         console.log('MongoDB Connected…')
@@ -36,13 +36,17 @@ var Todo = new mongoose.Schema({
    });
 var Todo = mongoose.model("Todo", Todo);
 
+//temporary for sending alert
+message=false;
+
 //Get method
 app.get('/',(req,res,next) =>{
     //Here fetch data using mongoose query like
     Todo.find({}, function(err, tasks) {
     if (err) throw err;
     // object of all the users
-    res.render(__dirname + '/index.html', { Todo:tasks ,idTask:'' } );
+    res.render(__dirname + '/index.html', { Todo:tasks ,idTask:'' ,message } );
+    message=false;
   });
 });
 
@@ -51,7 +55,8 @@ app.post('/send', function (req, res) {
     const myData = new Todo(req.body);
     myData.save()
         .then(() => {
-            res.redirect("/");
+            message = true;
+            res.redirect('/');
         })
         .catch(err => {  
             res.status(400).send("unable to save to database");
@@ -63,7 +68,7 @@ app.get('/edit/:id', (req, res) => {
     const id  = req.params.id;
     Todo.find({}, (err, tasks) => {
         if(err) res.send('error');
-        res.render(__dirname + '/index.html', { Todo: tasks, idTask: id });
+        res.render(__dirname + '/index.html', { Todo: tasks, idTask: id ,message });
     });
 });
 app.post('/edit/:id' ,(req , res) => {
@@ -72,17 +77,23 @@ app.post('/edit/:id' ,(req , res) => {
             name: req.body.name,
             priority   : req.body.priority
         },
-        (err, docs) => {
-            if(err) res.send('error go back');
-            else    res.redirect('/');
+        (err, tasks) => {
+            if(err) res.send('error cannot modify');
+            else{
+                message = true;
+                res.redirect('/');
+            }
         });
 })
 
 // delete a todo item
 app.get('/remove/:id', function(req, res){
 	Todo.deleteOne({_id: req.params.id}, 
-	   function(err, docs){
+        (err, tasks) => {
 		if(err) throw  err;
-		else    res.redirect('/');
+		else{
+            message = true;
+            res.redirect('/');
+        }
 	});
 });
