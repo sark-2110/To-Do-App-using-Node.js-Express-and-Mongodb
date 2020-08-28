@@ -43,11 +43,12 @@ message=false;
 app.get('/',(req,res,next) =>{
     //Here fetch data using mongoose query like
     Todo.find({}, function(err, tasks) {
-    if (err) throw err;
-    // object of all the users
-    res.render(__dirname + '/index.html', { Todo:tasks ,idTask:'' ,message } );
-    message=false;
-  });
+        console.log(tasks)
+        if (err) throw err;
+        // object of all the users
+        res.render(__dirname + '/index.html', { Todo:tasks ,idTask:'' ,message } );
+        message=false;
+    });
 });
 
 // POST method route
