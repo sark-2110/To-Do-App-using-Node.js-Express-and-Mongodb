@@ -87,3 +87,13 @@ app.post('/edit/:id' ,(req , res) => {
 })
 
 // delete a todo item
+app.get('/remove/:id', function(req, res){
+	Todo.deleteOne({_id: req.params.id}, 
+        (err, tasks) => {
+		if(err) throw  err;
+		else{
+            message = true;
+            res.redirect('/');
+        }
+	});
+});
